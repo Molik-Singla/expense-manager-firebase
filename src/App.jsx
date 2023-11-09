@@ -1,4 +1,6 @@
 import React from "react";
+
+// 👉 -------------------------------- Components ----------------------------------- //
 import { HomePage } from "./pages";
 
 const App = () => {

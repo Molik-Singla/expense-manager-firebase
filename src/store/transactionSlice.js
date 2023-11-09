@@ -1,16 +1,7 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
 
 const initialState = {
-    transactions: [
-        {
-            id: nanoid(),
-            title: "Buy new Bike",
-            description: "I need a new bike for my daily commute",
-            amount: 78900,
-            date: new Date().toISOString().split("T")[0],
-            transactionType: "expense",
-        },
-    ],
+    transactions: [],
 };
 
 const transactionSlice = createSlice({
@@ -34,10 +25,21 @@ const transactionSlice = createSlice({
                 };
             },
         },
+        editTransaction: (state, action) => {
+            const { id, title, description, amount, date, transactionType } = action.payload;
+            const existingTransaction = state.transactions.find((transaction) => transaction.id === id);
+            if (existingTransaction) {
+                existingTransaction.title = title;
+                existingTransaction.description = description;
+                existingTransaction.amount = amount;
+                existingTransaction.date = date;
+                existingTransaction.transactionType = transactionType;
+            }
+        },
     },
 });
 
-export const { addTransaction, deleteTransaction } = transactionSlice.actions;
+export const { addTransaction, deleteTransaction, editTransaction } = transactionSlice.actions;
 export const selectTransactions = (state) => state.transaction.transactions;
 
 export default transactionSlice.reducer;

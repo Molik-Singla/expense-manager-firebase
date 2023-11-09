@@ -1,11 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 
 // 👉 -------------------------------- Components ----------------------------------- //
 import { TextField } from "../../components";
 
-const TransactionForm = () => {
+const TransactionForm = ({ handleWorkingOfInputs, initialValues, buttonText = "Add new Transaction" }) => {
+    // 👉 ---------------------------- States/ Variables -------------------------------- //
+    const [inputValues, setInputValues] = useState({ ...initialValues });
+
+    // 👉 -------------------------- Functions/ useEffect ------------------------------- //
+    const handleSubmit = (evt) => {
+        evt.preventDefault();
+        handleWorkingOfInputs(inputValues);
+
+        setInputValues({
+            ...initialValues,
+        });
+    };
+    const handleOnChange = (evt) => {
+        const { name, value } = evt.target;
+        setInputValues((prev) => ({ ...prev, [name]: value }));
+    };
+
     return (
-        <form onSubmit={handleAddNewTransaction} className="flex flex-col gap-2" autoComplete="off" autoCorrect="off">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2" autoComplete="off" autoCorrect="off">
             <div className="grid w-full grid-cols-2 gap-2 mt-4">
                 <TextField required placeholder="Title" name={"title"} onChange={handleOnChange} value={inputValues?.title} />
                 <TextField
@@ -50,7 +67,7 @@ const TransactionForm = () => {
             />
 
             <button className="w-full p-2 mt-4 font-semibold text-black transition-all duration-200 bg-gray-200 rounded-lg hover:bg-gray-50">
-                Add new Transaction
+                {buttonText}
             </button>
         </form>
     );
