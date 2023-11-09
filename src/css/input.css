@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.custom-date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) !important; /* Invert the icon color to change it to black */
+}
+
+::-webkit-scrollbar {
+    width: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(162, 157, 157, 0.6);
+    border-radius: 2px;
+}
+::-webkit-scrollbar-track {
+    background: black;
+    border-radius: 2px;
+}
+scrollbar-thumb {
+    background-color: rgb(162, 157, 157, 0.6);
+    border-radius: 2px;
+}
+
+scrollbar-track {
+    background: #f1f1f1;
+}
