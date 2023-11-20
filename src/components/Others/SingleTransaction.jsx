@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 
+// 👉 -------------------------------- Components ----------------------------------- //
+import EditTransactionPortal from "../portals/EditTransactionPortal";
+
 // 👉 -------------------------------------- ICONS -------------------------------------- //
 import { MdModeEdit, MdDelete } from "react-icons/md";
-import EditTransactionPortal from "../portals/EditTransactionPortal";
 
 const SingleTransaction = ({ id, title, description = "", amount = 0, date = "", transactionType, handleDelete, handleEdit }) => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
@@ -16,15 +18,20 @@ const SingleTransaction = ({ id, title, description = "", amount = 0, date = "",
         transactionType,
     };
 
+    // 👉 -------------------------- Functions/ useEffect ------------------------------- //
+    const handleOpenPortal = () => setIsEditPortal(true);
+    const handleClosePortal = () => setIsEditPortal(false);
+    const handleDeleteTransaction = () => handleDelete(id);
+
     return (
         <>
-            {isEditPortal && (
-                <EditTransactionPortal
-                    initialValues={initialStateForEdit}
-                    handleEdit={handleEdit}
-                    handleClosePortal={() => setIsEditPortal(false)}
-                />
-            )}
+            <EditTransactionPortal
+                initialValues={initialStateForEdit}
+                handleEdit={handleEdit}
+                handleClosePortal={handleClosePortal}
+                isPortalOpen={isEditPortal}
+            />
+
             <section className="flex flex-col gap-4 p-2 single">
                 <div className="flex justify-between w-full">
                     <div className="flex flex-col gap-[2px] w-full">
@@ -38,7 +45,6 @@ const SingleTransaction = ({ id, title, description = "", amount = 0, date = "",
                                 transactionType === "expense" ? "text-red-600" : "text-green-600"
                             }`}
                         >
-                            {/* {transactionType === "expense" ? "-" : ""} */}
                             {amount?.toLocaleString()}
                         </p>
                         <p className="text-gray-500">{date}</p>
@@ -47,13 +53,13 @@ const SingleTransaction = ({ id, title, description = "", amount = 0, date = "",
 
                 <div className="flex flex-row self-end gap-4">
                     <button
-                        onClick={() => setIsEditPortal(true)}
+                        onClick={handleOpenPortal}
                         className="flex items-center justify-center w-8 h-8 bg-green-600 rounded-md cursor-pointer"
                     >
                         <MdModeEdit className="text-lg text-white cursor-pointer" />
                     </button>
                     <button
-                        onClick={() => handleDelete(id)}
+                        onClick={handleDeleteTransaction}
                         className="flex items-center justify-center w-8 h-8 bg-red-600 rounded-md cursor-pointer"
                     >
                         <MdDelete className="text-lg text-white cursor-pointer" />

@@ -26,13 +26,20 @@ const AuthPage = () => {
         const { name, value } = evt.target;
         setInputValues((prev) => ({ ...prev, [name]: value }));
     };
-
     const handleSubmit = (evt) => {
         evt.preventDefault();
-        console.log(inputValues);
+
+        // handle signup
+        if (isSignUp && inputValues.password !== inputValues.confirmPassword) {
+            // Show error message on tooltip
+            return console.log("Passwords don't match");
+        }
+
+        // handle login
         dispatch(login());
         navigate("/");
     };
+    const handleChangeLoginOrSignup = () => setIsSignUp((prev) => !prev);
 
     return (
         <section className="flex items-center justify-center min-h-screen text-white bg-gray-900 font-primary">
@@ -80,7 +87,7 @@ const AuthPage = () => {
                 <div className="flex items-center justify-center w-full gap-2 text-sm sm:text-base">
                     <span>{isSignUp ? "Already have an account?" : "Don't have an account?"}</span>
                     <button
-                        onClick={() => setIsSignUp((prev) => !prev)}
+                        onClick={handleChangeLoginOrSignup}
                         className="text-blue-400 transition-all duration-150 origin-center cursor-pointer hover:scale-105"
                     >
                         {isSignUp ? "Login" : "Signup"}

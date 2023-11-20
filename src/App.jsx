@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 // 👉 -------------------------------- Components ----------------------------------- //
 import { AuthPage, HomePage } from "./pages";

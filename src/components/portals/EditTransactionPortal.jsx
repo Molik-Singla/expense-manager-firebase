@@ -7,12 +7,14 @@ import { TransactionForm } from "../../components";
 // 👉 -------------------------------------- ICONS -------------------------------------- //
 import { RxCross2 } from "react-icons/rx";
 
-const EditTransactionPortal = ({ initialValues, handleClosePortal, handleEdit }) => {
+const EditTransactionPortal = ({ isPortalOpen, initialValues, handleClosePortal, handleEdit }) => {
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
-    const handleEditTransaction = (inputValues) => {
-        handleEdit(inputValues);
+    const handleEditTransaction = (newValues) => {
+        handleEdit(newValues);
         handleClosePortal();
     };
+
+    if (!isPortalOpen) return null;
 
     return ReactDOM.createPortal(
         <>

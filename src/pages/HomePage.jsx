@@ -16,10 +16,10 @@ const HomePage = () => {
     const transactions = useSelector(selectTransactions);
 
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
-    const handleAddNewTransaction = (inputValues) => {
+    const handleAddNewTransaction = (newValues) => {
         dispatch(
             addTransaction({
-                ...inputValues,
+                ...newValues,
             })
         );
     };
@@ -27,8 +27,8 @@ const HomePage = () => {
         if (!id) throw new Error("Please provide a valid ID");
         dispatch(deleteTransaction(id));
     };
-    const handleEditTransaction = (inputValues) => {
-        dispatch(editTransaction(inputValues));
+    const handleEditTransaction = (newValues) => {
+        dispatch(editTransaction(newValues));
     };
 
     return (
