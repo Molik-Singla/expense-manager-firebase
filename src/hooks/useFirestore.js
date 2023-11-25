@@ -2,7 +2,7 @@ import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase
 import { firebaseStore } from "../config/firebase";
 
 const useFirestore = (initialState = null, collectionName) => {
-    const collectionRef = collection(collectionName);
+    const collectionRef = collection(firebaseStore, collectionName);
 
     const executeAfterFunctionWork = (afterFunctionWork, data = null) => {
         afterFunctionWork && afterFunctionWork(data);
@@ -23,8 +23,8 @@ const useFirestore = (initialState = null, collectionName) => {
     };
     const apiAddDoc = async (afterFunctionWork = null, values) => {
         try {
-            await addDoc(collectionRef, values);
-            executeAfterFunctionWork(afterFunctionWork);
+            const res = await addDoc(collectionRef, values);
+            executeAfterFunctionWork(afterFunctionWork, res?.id);
         } catch (err) {
             console.log(err);
         }

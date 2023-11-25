@@ -1,4 +1,4 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     transactions: [],
@@ -19,7 +19,6 @@ const transactionSlice = createSlice({
             prepare: (transactionPayload) => {
                 return {
                     payload: {
-                        id: nanoid(),
                         ...transactionPayload,
                     },
                 };

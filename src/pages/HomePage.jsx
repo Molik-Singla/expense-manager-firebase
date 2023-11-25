@@ -15,66 +15,55 @@ import {
     addTransactions,
 } from "../store/transactionSlice";
 import { INPUT_VALUES_INITIAL_STATE } from "../utils/constants";
-import { firebaseStore } from "../config/firebase";
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
+import useFirestore from "../hooks/useFirestore";
 
 const HomePage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
     const dispatch = useDispatch();
     const transactions = useSelector(selectTransactions);
-    const expenseCollRef = collection(firebaseStore, "expenses");
+
+    const { apiAddDoc, apiDeleteDoc, apiGetDocs, apiUpdateDoc } = useFirestore(null, "expenses");
 
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
 
-    const apiGetExpenses = async () => {
-        try {
-            const data = await getDocs(expenseCollRef);
-            const filteredActualData = data.docs.map((doc) => ({
-                id: doc?.id,
-                ...doc?.data(),
-                amount: parseInt(doc?.data()?.amount),
-            }));
-
-            dispatch(addTransactions(filteredActualData));
-        } catch (err) {
-            console.log(err);
-        }
+    const apiGetExpenses = () => {
+        apiGetDocs((data) => {
+            dispatch(addTransactions(data));
+        });
     };
+    const handleAddNewTransaction = (newValues) => {
+        const newData = {
+            title: newValues?.title,
+            description: newValues?.description,
+            amount: newValues?.amount,
+            date: newValues?.date,
+            transactionType: newValues?.transactionType,
+        };
 
-    const handleAddNewTransaction = async (newValues) => {
-        try {
-            await addDoc(expenseCollRef, {
-                title: newValues?.title,
-                description: newValues?.description,
-                amount: newValues?.amount,
-                date: newValues?.date,
-                transactionType: newValues?.transactionType,
-            });
+        apiAddDoc((id) => {
             dispatch(
                 addTransaction({
-                    ...newValues,
+                    id,
+                    ...newData,
                 })
             );
-        } catch (err) {
-            console.log(err);
-        }
+        }, newData);
     };
-    const handleDeleteTransaction = async (id = null) => {
-        try {
-            if (!id) throw new Error("Please provide a valid ID");
-            await deleteDoc(doc(firebaseStore, "expenses", id));
+    const handleDeleteTransaction = (id = null) => {
+        if (!id) throw new Error("Please provide a valid ID");
+        apiDeleteDoc(() => {
             dispatch(deleteTransaction(id));
-        } catch (err) {
-            console.log(err);
-        }
+        }, id);
+        // await deleteDoc(doc(firebaseStore, "expenses", id));
     };
-    const handleEditTransaction = async (newValues) => {
-        try {
-            await updateDoc(doc(firebaseStore, "expenses", newValues?.id), { ...newValues });
-            dispatch(editTransaction(newValues));
-        } catch (err) {
-            console.log(err);
-        }
+    const handleEditTransaction = (newValues) => {
+        apiUpdateDoc(
+            () => {
+                dispatch(editTransaction(newValues));
+            },
+            newValues?.id,
+            newValues
+        );
     };
 
     useEffect(() => {
