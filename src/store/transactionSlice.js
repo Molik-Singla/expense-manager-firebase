@@ -25,6 +25,9 @@ const transactionSlice = createSlice({
                 };
             },
         },
+        addTransactions: (state, action) => {
+            state.transactions = [...state.transactions, ...action.payload];
+        },
         editTransaction: (state, action) => {
             const { id, title, description, amount, date, transactionType } = action.payload;
             const existingTransaction = state.transactions.find((transaction) => transaction.id === id);
@@ -39,7 +42,7 @@ const transactionSlice = createSlice({
     },
 });
 
-export const { addTransaction, deleteTransaction, editTransaction } = transactionSlice.actions;
+export const { addTransaction, deleteTransaction, editTransaction, addTransactions } = transactionSlice.actions;
 export const selectTransactions = (state) => state.transaction.transactions;
 
 export default transactionSlice.reducer;

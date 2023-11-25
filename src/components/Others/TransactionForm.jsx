@@ -17,8 +17,9 @@ const TransactionForm = ({ handleWorkingOfInputs, initialValues, buttonText = "A
         });
     };
     const handleOnChange = (evt) => {
-        const { name, value } = evt.target;
-        setInputValues((prev) => ({ ...prev, [name]: value }));
+        const { name, value, type } = evt.target;
+        // change below code so that type="number" can also work
+        setInputValues((prev) => ({ ...prev, [name]: type === "number" ? parseInt(value) : value }));
     };
 
     return (

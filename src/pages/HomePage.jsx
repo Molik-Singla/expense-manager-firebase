@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 // 👉 ---------------------------------- Hooks -------------------------------------- //
 import { useSelector, useDispatch } from "react-redux";
@@ -7,29 +7,79 @@ import { useSelector, useDispatch } from "react-redux";
 import { SingleTransaction, TransactionForm } from "../components";
 
 // 👉 --------------------------------- Others -------------------------------------- //
-import { addTransaction, deleteTransaction, editTransaction, selectTransactions } from "../store/transactionSlice";
+import {
+    addTransaction,
+    deleteTransaction,
+    editTransaction,
+    selectTransactions,
+    addTransactions,
+} from "../store/transactionSlice";
 import { INPUT_VALUES_INITIAL_STATE } from "../utils/constants";
+import { firebaseStore } from "../config/firebase";
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 
 const HomePage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
     const dispatch = useDispatch();
     const transactions = useSelector(selectTransactions);
+    const expenseCollRef = collection(firebaseStore, "expenses");
 
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
-    const handleAddNewTransaction = (newValues) => {
-        dispatch(
-            addTransaction({
-                ...newValues,
-            })
-        );
+
+    const apiGetExpenses = async () => {
+        try {
+            const data = await getDocs(expenseCollRef);
+            const filteredActualData = data.docs.map((doc) => ({
+                id: doc?.id,
+                ...doc?.data(),
+                amount: parseInt(doc?.data()?.amount),
+            }));
+
+            dispatch(addTransactions(filteredActualData));
+        } catch (err) {
+            console.log(err);
+        }
     };
-    const handleDeleteTransaction = (id = null) => {
-        if (!id) throw new Error("Please provide a valid ID");
-        dispatch(deleteTransaction(id));
+
+    const handleAddNewTransaction = async (newValues) => {
+        try {
+            await addDoc(expenseCollRef, {
+                title: newValues?.title,
+                description: newValues?.description,
+                amount: newValues?.amount,
+                date: newValues?.date,
+                transactionType: newValues?.transactionType,
+            });
+            dispatch(
+                addTransaction({
+                    ...newValues,
+                })
+            );
+        } catch (err) {
+            console.log(err);
+        }
     };
-    const handleEditTransaction = (newValues) => {
-        dispatch(editTransaction(newValues));
+    const handleDeleteTransaction = async (id = null) => {
+        try {
+            if (!id) throw new Error("Please provide a valid ID");
+            await deleteDoc(doc(firebaseStore, "expenses", id));
+            dispatch(deleteTransaction(id));
+        } catch (err) {
+            console.log(err);
+        }
     };
+    const handleEditTransaction = async (newValues) => {
+        try {
+            await updateDoc(doc(firebaseStore, "expenses", newValues?.id), { ...newValues });
+            dispatch(editTransaction(newValues));
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    useEffect(() => {
+        apiGetExpenses();
+    }, []);
 
     return (
         <section className="flex items-center justify-center w-full h-full min-h-screen bg-black font-primary">
@@ -49,7 +99,7 @@ const HomePage = () => {
 
                 <TransactionForm handleWorkingOfInputs={handleAddNewTransaction} initialValues={INPUT_VALUES_INITIAL_STATE} />
 
-                <section className="h-full mt-4 overflow-auto transactions">
+                <section className="flex flex-col h-full gap-5 py-3 mt-4 overflow-auto transactions">
                     {transactions.map((transaction) => {
                         return (
                             <SingleTransaction

@@ -10,6 +10,9 @@ import { TextField } from "../components";
 import { login } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 
+import { firebaseAuth } from "../config/firebase";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCustomToken } from "firebase/auth";
+
 const AuthPage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
     const dispatch = useDispatch();
@@ -26,13 +29,30 @@ const AuthPage = () => {
         const { name, value } = evt.target;
         setInputValues((prev) => ({ ...prev, [name]: value }));
     };
-    const handleSubmit = (evt) => {
+    const handleSubmit = async (evt) => {
         evt.preventDefault();
 
-        // handle signup
         if (isSignUp && inputValues.password !== inputValues.confirmPassword) {
             // Show error message on tooltip
             return console.log("Passwords don't match");
+        } else if (isSignUp) {
+            try {
+                const response = await createUserWithEmailAndPassword(firebaseAuth, inputValues?.email, inputValues?.password);
+                const { user } = response;
+                const token = await user?.getIdToken();
+                console.log(token);
+            } catch (error) {
+                console.log(error);
+            }
+        } else if (!isSignUp) {
+            try {
+                const response = await signInWithEmailAndPassword(firebaseAuth, inputValues?.email, inputValues?.password);
+                const { user } = response;
+                const token = await user?.getIdToken();
+                console.log(token);
+            } catch (error) {
+                console.log(error);
+            }
         }
 
         // handle login
@@ -45,7 +65,7 @@ const AuthPage = () => {
         <section className="flex items-center justify-center min-h-screen text-white bg-gray-900 font-primary">
             <form
                 autoComplete="off"
-                onSubmit={handleSubmit}
+                onSubmit={(evt) => evt.preventDefault()}
                 className="flex flex-col items-center gap-3 p-4 bg-transparent rounded-md w-[94%] md:w-4/5 max-w-[380px]"
             >
                 <div className="flex flex-col w-full gap-4">
@@ -81,7 +101,10 @@ const AuthPage = () => {
                         />
                     )}
                 </div>
-                <button className="w-full p-2 mt-4 font-semibold text-black transition-all duration-200 bg-gray-200 rounded-lg hover:bg-gray-50">
+                <button
+                    onClick={handleSubmit}
+                    className="w-full p-2 mt-4 font-semibold text-black transition-all duration-200 bg-gray-200 rounded-lg hover:bg-gray-50"
+                >
                     {isSignUp ? "Signup" : "Login"}
                 </button>
                 <div className="flex items-center justify-center w-full gap-2 text-sm sm:text-base">

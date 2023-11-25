@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 // 👉 ---------------------------------- Hooks -------------------------------------- //
 import { useSelector } from "react-redux";
@@ -10,9 +10,8 @@ import { Navigate } from "react-router-dom";
 import { selectAuth } from "../store/authSlice";
 
 const ProtectedRoute = ({ children }) => {
-    const isLogin = useSelector(selectAuth);
-
-    return !isLogin ? <Navigate to="/auth" /> : children;
+    const authState = useSelector(selectAuth);
+    return !authState?.isLogin ? <Navigate to="/auth" /> : children;
 };
 
 export default ProtectedRoute;
