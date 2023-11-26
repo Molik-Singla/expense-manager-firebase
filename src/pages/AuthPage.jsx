@@ -11,9 +11,9 @@ import Button from "../components/Layouts/Button";
 import LoadingSpinner from "./../animations/LoadingSpinner";
 
 // 👉 --------------------------------- Others -------------------------------------- //
+import Cookies from "js-cookie";
 import { login } from "../store/authSlice";
 import { notifyError } from "../animations/Toastify";
-import Cookies from "js-cookie";
 
 const AuthPage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
@@ -26,6 +26,7 @@ const AuthPage = () => {
         confirmPassword: "",
     });
     const [isSignUp, setIsSignUp] = useState(false);
+
     const myLoader = (
         <div className="flex justify-center w-full">
             <LoadingSpinner size="small" />

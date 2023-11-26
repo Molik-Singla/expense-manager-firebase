@@ -1,6 +1,15 @@
+// DOCS =>
+// 1. This hook is used to perform CRUD operations on firestore
+// 2. We have loadings for get , add , delete and update operations
+// 3. We need to pass collection name to perform operations on that collection
+// 4. We have onBefore and onAfter callbacks to perform some actions before and after api call
+// 5. We have handleErrors function to handle errors and display custom messages according to error code
+// 6. We have getDocs , getDocsByQuery , addDoc , deleteDoc , updateDoc , getSingleDoc functions
+// 7. We have 6 API functions and 4 loading states
+
+import { useState } from "react";
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc, getDoc, query } from "firebase/firestore";
 import { firebaseStore } from "../config/firebase";
-import { useState } from "react";
 import { notifyError } from "../animations/Toastify";
 
 const handleErrors = (err) => {
@@ -49,7 +58,6 @@ const useFirestore = (initialState = null, collectionName) => {
             setGetLoading(false);
         }
     };
-
     const apiGetDocsByQuery = async ({ ...takeOnParameter }, queryParam) => {
         try {
             const myQuery = query(collectionRef, queryParam);
@@ -108,7 +116,6 @@ const useFirestore = (initialState = null, collectionName) => {
             setUpdateLoading(false);
         }
     };
-
     const getSingleDoc = async ({ ...takeOnParameter }, id) => {
         try {
             executeOnBefore(takeOnParameter?.onBefore);

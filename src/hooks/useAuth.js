@@ -1,3 +1,11 @@
+// DOCS =>
+// 1. We have loading for login , signup
+// 2. We can provide onBefore and onAfter for each api
+// 3. onAfter have access to data ( here it is token & user data ) ( If there is any )
+// 4. We can loginUser with email and password , signupUser with email and password , login with google , logoutUser
+// 5. We handle some errors and display ( using react-toastify ) custom messages according to error code of firebase
+// 6. You can use 4 API Functions and 2 Loading States
+
 import { useState } from "react";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup } from "firebase/auth";
 import { firebaseAuth, googleProvider } from "../config/firebase";

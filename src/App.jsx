@@ -23,7 +23,7 @@ const App = () => {
 
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
     // navigate the user according to it is login or not
-
+    // When user is login then we have user data in cookies so we can get it from there and update the state
     useEffect(() => {
         const userData = JSON.parse(Cookies.get("user") || null);
         const tokenData = JSON.parse(Cookies.get("token") || null);

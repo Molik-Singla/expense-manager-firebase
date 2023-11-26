@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 
 // 👉 ---------------------------------- Hooks -------------------------------------- //
+import { useSelector, useDispatch } from "react-redux";
 import useFirestore from "../hooks/useFirestore";
 import useAuth from "../hooks/useAuth";
-import { useSelector, useDispatch } from "react-redux";
 
 // 👉 -------------------------------- Components ----------------------------------- //
 import SingleTransaction from "../components/Others/SingleTransaction";
@@ -12,6 +12,7 @@ import Button from "../components/Layouts/Button";
 import LoadingSpinner from "../animations/LoadingSpinner";
 
 // 👉 --------------------------------- Others -------------------------------------- //
+import Cookies from "js-cookie";
 import { logout, selectAuth } from "../store/authSlice";
 import { where } from "firebase/firestore";
 import {
@@ -23,7 +24,6 @@ import {
     clearTransactions,
 } from "../store/transactionSlice";
 import { INPUT_VALUES_INITIAL_STATE } from "../utils/constants";
-import Cookies from "js-cookie";
 
 const HomePage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
@@ -59,7 +59,8 @@ const HomePage = () => {
             where("userID", "==", currentUser?.user?.uid)
         );
     };
-    const handleAddNewTransaction = (newValues) => {
+    const handleAddNewTransaction = (newValues = null) => {
+        if (!newValues) throw new Error("Please provide some data");
         const newData = {
             title: newValues?.title,
             description: newValues?.description,
@@ -74,6 +75,7 @@ const HomePage = () => {
                 onAfter: (response) =>
                     dispatch(
                         addTransaction({
+                            // doc id
                             id: response?.id,
                             ...newData,
                         })
@@ -91,7 +93,8 @@ const HomePage = () => {
             id
         );
     };
-    const handleEditTransaction = (newValues) => {
+    const handleEditTransaction = (newValues = null) => {
+        if (!newValues) throw new Error("Please provide some data");
         apiUpdateDoc(
             {
                 onBefore: () => dispatch(editTransaction(newValues)),
