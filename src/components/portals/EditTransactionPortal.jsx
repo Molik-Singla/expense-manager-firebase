@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 // 👉 -------------------------------- Components ----------------------------------- //
-import TransactionForm from "../../components/Others/TransactionForm";
+import TransactionForm from "../Others/TransactionForm";
 import Button from "../Layouts/Button";
 
 // 👉 -------------------------------------- ICONS -------------------------------------- //

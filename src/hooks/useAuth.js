@@ -3,7 +3,22 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, si
 import { firebaseAuth, googleProvider } from "../config/firebase";
 import { notifyError } from "../animations/Toastify";
 
-const handleErrors = (err) => notifyError(err.message || "Something went wrong");
+const handleErrors = (err) => {
+    const errorMapping = {
+        // Authentication Errors
+        "auth/user-not-found": "User not found. Please check your credentials.",
+        "auth/wrong-password": "Incorrect password. Please try again.",
+        "auth/email-already-in-use": "The email address is already in use by another account.",
+        "auth/invalid-email": "The email address is not valid.",
+        "auth/user-disabled": "This account has been disabled.",
+        "auth/user-token-expired": "The user token has expired. Please log in again.",
+        "auth/weak-password": "Password should be at least 6 characters long.",
+        "auth/invalid-login-credentials": "Invalid login credentials. Please try again.",
+    };
+
+    if (err?.code in errorMapping) return notifyError(errorMapping[err?.code]);
+    return notifyError(err.message || "Something went wrong");
+};
 
 const useAuth = () => {
     const [loginLoading, setLoginLoading] = useState(false);

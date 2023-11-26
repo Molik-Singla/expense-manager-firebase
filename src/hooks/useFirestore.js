@@ -1,6 +1,21 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseStore } from "../config/firebase";
 import { useState } from "react";
+import { notifyError } from "../animations/Toastify";
+
+const handleErrors = (err) => {
+    const errorMappings = {
+        // Firestore Errors
+        "permission-denied": "Permission denied. You do not have access to perform this action.",
+        "not-found": "The requested document does not exist.",
+        aborted: "The operation was aborted.",
+        unavailable: "The service is currently unavailable. Please try again later.",
+        "data-loss": "There was a data loss during the operation.",
+    };
+
+    if (err?.code in errorMappings) return notifyError(errorMappings[err?.code]);
+    return notifyError(err.message || "Something went wrong");
+};
 
 const useFirestore = (initialState = null, collectionName) => {
     const [getLoading, setGetLoading] = useState(false);
@@ -29,7 +44,9 @@ const useFirestore = (initialState = null, collectionName) => {
             setGetLoading(false);
             executeOnAfter(takeOnParameter?.onAfter, filteredDocs);
         } catch (err) {
-            console.log(err);
+            handleErrors(err);
+        } finally {
+            setGetLoading(false);
         }
     };
     const apiAddDoc = async ({ ...takeOnParameter }, values) => {
@@ -40,7 +57,9 @@ const useFirestore = (initialState = null, collectionName) => {
             setAddLoading(false);
             executeOnAfter(takeOnParameter?.onAfter, response);
         } catch (err) {
-            console.log(err);
+            handleErrors(err);
+        } finally {
+            setAddLoading(false);
         }
     };
     const apiDeleteDoc = async ({ ...takeOnParameter }, id) => {
@@ -51,7 +70,9 @@ const useFirestore = (initialState = null, collectionName) => {
             setDeleteLoading(false);
             executeOnAfter(takeOnParameter?.onAfter);
         } catch (err) {
-            console.log(err);
+            handleErrors(err);
+        } finally {
+            setDeleteLoading(false);
         }
     };
     const apiUpdateDoc = async ({ ...takeOnParameter }, id, newValues) => {
@@ -62,7 +83,9 @@ const useFirestore = (initialState = null, collectionName) => {
             setUpdateLoading(false);
             executeOnAfter(takeOnParameter?.onAfter, response);
         } catch (err) {
-            console.log(err);
+            handleErrors(err);
+        } finally {
+            setUpdateLoading(false);
         }
     };
 

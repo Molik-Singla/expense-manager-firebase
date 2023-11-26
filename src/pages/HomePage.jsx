@@ -38,7 +38,7 @@ const HomePage = () => {
         ?.toLocaleString();
 
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
-    const apiGetExpenses = () => {
+    const apiGetTransactions = () => {
         apiGetDocs({
             onAfter: (data) => {
                 dispatch(addTransactions(data));
@@ -95,7 +95,7 @@ const HomePage = () => {
     };
 
     useEffect(() => {
-        apiGetExpenses();
+        apiGetTransactions();
     }, []);
 
     return (
