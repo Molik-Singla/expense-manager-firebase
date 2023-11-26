@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 
 // 👉 -------------------------------- Components ----------------------------------- //
-import { TextField } from "../../components";
+import TextField from "../../components/Inputs/TextField";
+import Button from "../Layouts/Button";
 
 const TransactionForm = ({ handleWorkingOfInputs, initialValues, buttonText = "Add new Transaction" }) => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
@@ -17,9 +18,8 @@ const TransactionForm = ({ handleWorkingOfInputs, initialValues, buttonText = "A
         });
     };
     const handleOnChange = (evt) => {
-        const { name, value, type } = evt.target;
-        // change below code so that type="number" can also work
-        setInputValues((prev) => ({ ...prev, [name]: type === "number" ? parseInt(value) : value }));
+        const { name, value } = evt.target;
+        setInputValues((prev) => ({ ...prev, [name]: value }));
     };
 
     return (
@@ -67,9 +67,7 @@ const TransactionForm = ({ handleWorkingOfInputs, initialValues, buttonText = "A
                 value={inputValues?.description}
             />
 
-            <button className="w-full p-2 mt-4 font-semibold text-black transition-all duration-200 bg-gray-200 rounded-lg hover:bg-gray-50">
-                {buttonText}
-            </button>
+            <Button type="submit">{buttonText}</Button>
         </form>
     );
 };

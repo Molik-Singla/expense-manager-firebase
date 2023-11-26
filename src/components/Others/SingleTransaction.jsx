@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 // 👉 -------------------------------- Components ----------------------------------- //
 import EditTransactionPortal from "../portals/EditTransactionPortal";
+import Button from "../Layouts/Button";
 
 // 👉 -------------------------------------- ICONS -------------------------------------- //
 import { MdModeEdit, MdDelete } from "react-icons/md";
@@ -52,18 +53,18 @@ const SingleTransaction = ({ id, title, description = "", amount = 0, date = "",
                 </div>
 
                 <div className="flex flex-row self-end gap-4">
-                    <button
+                    <Button
                         onClick={handleOpenPortal}
                         className="flex items-center justify-center w-8 h-8 bg-green-600 rounded-md cursor-pointer"
                     >
                         <MdModeEdit className="text-lg text-white cursor-pointer" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleDeleteTransaction}
                         className="flex items-center justify-center w-8 h-8 bg-red-600 rounded-md cursor-pointer"
                     >
                         <MdDelete className="text-lg text-white cursor-pointer" />
-                    </button>
+                    </Button>
                 </div>
             </section>
         </>

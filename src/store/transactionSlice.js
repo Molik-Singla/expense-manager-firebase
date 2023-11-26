@@ -38,10 +38,14 @@ const transactionSlice = createSlice({
                 existingTransaction.transactionType = transactionType;
             }
         },
+        clearTransactions: (state) => {
+            state.transactions = [];
+        },
     },
 });
 
-export const { addTransaction, deleteTransaction, editTransaction, addTransactions } = transactionSlice.actions;
+export const { addTransaction, deleteTransaction, editTransaction, addTransactions, clearTransactions } =
+    transactionSlice.actions;
 export const selectTransactions = (state) => state.transaction.transactions;
 
 export default transactionSlice.reducer;

@@ -1,63 +1,81 @@
 import React, { useState } from "react";
 
 // 👉 ---------------------------------- Hooks -------------------------------------- //
+import useAuth from "../hooks/useAuth";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 // 👉 -------------------------------- Components ----------------------------------- //
-import { TextField } from "../components";
+import TextField from "../components/Inputs/TextField";
+import Button from "../components/Layouts/Button";
+import LoadingSpinner from "./../animations/LoadingSpinner";
 
 // 👉 --------------------------------- Others -------------------------------------- //
 import { login } from "../store/authSlice";
-import { useNavigate } from "react-router-dom";
-
-import { firebaseAuth } from "../config/firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCustomToken } from "firebase/auth";
+import { notifyError } from "../animations/Toastify";
 
 const AuthPage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { apiSignupWithEmailPassword, apiLoginWithEmailPassword, apiLoginWithGoogle, loginLoading, signupLoading } = useAuth();
     const [inputValues, setInputValues] = useState({
         email: "",
         password: "",
         confirmPassword: "",
     });
     const [isSignUp, setIsSignUp] = useState(false);
+    const myLoader = (
+        <div className="flex justify-center w-full">
+            <LoadingSpinner size="small" />
+        </div>
+    );
 
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
     const handleOnChange = (evt) => {
         const { name, value } = evt.target;
         setInputValues((prev) => ({ ...prev, [name]: value }));
     };
-    const handleSubmit = async (evt) => {
+    const handleAuthentication = async (evt) => {
         evt.preventDefault();
 
         if (isSignUp && inputValues.password !== inputValues.confirmPassword) {
             // Show error message on tooltip
-            return console.log("Passwords don't match");
+            return notifyError("Password and Confirm Password must be same");
         } else if (isSignUp) {
-            try {
-                const response = await createUserWithEmailAndPassword(firebaseAuth, inputValues?.email, inputValues?.password);
-                const { user } = response;
-                const token = await user?.getIdToken();
-                console.log(token);
-            } catch (error) {
-                console.log(error);
-            }
+            // signup
+            apiSignupWithEmailPassword(
+                {
+                    onAfter: () => {
+                        dispatch(login());
+                        navigate("/");
+                    },
+                },
+                inputValues?.email,
+                inputValues?.password
+            );
         } else if (!isSignUp) {
-            try {
-                const response = await signInWithEmailAndPassword(firebaseAuth, inputValues?.email, inputValues?.password);
-                const { user } = response;
-                const token = await user?.getIdToken();
-                console.log(token);
-            } catch (error) {
-                console.log(error);
-            }
+            // Login
+            apiLoginWithEmailPassword(
+                {
+                    onAfter: () => {
+                        dispatch(login());
+                        navigate("/");
+                    },
+                },
+                inputValues?.email,
+                inputValues?.password
+            );
         }
+    };
 
-        // handle login
-        dispatch(login());
-        navigate("/");
+    const handleAuthenticationWithGoogle = () => {
+        apiLoginWithGoogle({
+            onAfter: () => {
+                dispatch(login());
+                navigate("/");
+            },
+        });
     };
     const handleChangeLoginOrSignup = () => setIsSignUp((prev) => !prev);
 
@@ -65,7 +83,6 @@ const AuthPage = () => {
         <section className="flex items-center justify-center min-h-screen text-white bg-gray-900 font-primary">
             <form
                 autoComplete="off"
-                onSubmit={(evt) => evt.preventDefault()}
                 className="flex flex-col items-center gap-3 p-4 bg-transparent rounded-md w-[94%] md:w-4/5 max-w-[380px]"
             >
                 <div className="flex flex-col w-full gap-4">
@@ -101,29 +118,28 @@ const AuthPage = () => {
                         />
                     )}
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    className="w-full p-2 mt-4 font-semibold text-black transition-all duration-200 bg-gray-200 rounded-lg hover:bg-gray-50"
-                >
-                    {isSignUp ? "Signup" : "Login"}
-                </button>
+                <Button type="submit" onClick={handleAuthentication}>
+                    {!loginLoading && !signupLoading && (isSignUp ? "Signup" : "Login")}
+                    {loginLoading && myLoader}
+                    {signupLoading && myLoader}
+                </Button>
                 <div className="flex items-center justify-center w-full gap-2 text-sm sm:text-base">
                     <span>{isSignUp ? "Already have an account?" : "Don't have an account?"}</span>
-                    <button
+                    <Button
                         onClick={handleChangeLoginOrSignup}
                         className="text-blue-400 transition-all duration-150 origin-center cursor-pointer hover:scale-105"
                     >
                         {isSignUp ? "Login" : "Signup"}
-                    </button>
+                    </Button>
                 </div>
                 <div className="relative flex items-center justify-center w-full h-4 mt-6">
                     <div className="absolute px-3 bg-gray-900">Or</div>
                     <div className="w-full h-[1px] bg-white mx-1"></div>
                 </div>
 
-                <button className="w-full p-2 mt-4 font-medium text-white transition-all duration-200 bg-red-600 rounded-lg hover:bg-red-500">
+                <Button onClick={handleAuthenticationWithGoogle} additionalClasses="text-white bg-red-600 hover:bg-red-500">
                     Signup with Google
-                </button>
+                </Button>
             </form>
         </section>
     );

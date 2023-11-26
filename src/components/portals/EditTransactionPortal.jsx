@@ -2,7 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 // 👉 -------------------------------- Components ----------------------------------- //
-import { TransactionForm } from "../../components";
+import TransactionForm from "../../components/Others/TransactionForm";
+import Button from "../Layouts/Button";
 
 // 👉 -------------------------------------- ICONS -------------------------------------- //
 import { RxCross2 } from "react-icons/rx";
@@ -22,12 +23,12 @@ const EditTransactionPortal = ({ isPortalOpen, initialValues, handleClosePortal,
                 <section className="flex flex-col w-4/5 max-w-md p-6 bg-transparent border-2 border-gray-300 rounded-lg shadow-lg">
                     <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-500">
                         <p className="text-xl">Edit</p>
-                        <button
+                        <Button
                             onClick={handleClosePortal}
                             className="flex items-center justify-center w-8 h-8 bg-red-600 rounded-md cursor-pointer"
                         >
                             <RxCross2 className="text-lg text-white cursor-pointer" />
-                        </button>
+                        </Button>
                     </div>
                     <TransactionForm
                         handleWorkingOfInputs={handleEditTransaction}

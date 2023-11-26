@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 // 👉 ---------------------------------- Hooks -------------------------------------- //
 import { useSelector } from "react-redux";

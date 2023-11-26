@@ -1,52 +1,72 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseStore } from "../config/firebase";
+import { useState } from "react";
 
 const useFirestore = (initialState = null, collectionName) => {
+    const [getLoading, setGetLoading] = useState(false);
+    const [addLoading, setAddLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [updateLoading, setUpdateLoading] = useState(false);
+
     const collectionRef = collection(firebaseStore, collectionName);
 
-    const executeAfterFunctionWork = (afterFunctionWork, data = null) => {
-        afterFunctionWork && afterFunctionWork(data);
-    };
+    const executeOnAfter = (onAfter = null, data = null) => onAfter && onAfter(data);
+    const executeOnBefore = (onBefore = null) => onBefore && onBefore();
 
-    const apiGetDocs = async (afterFunctionWork = null) => {
+    // const takeOnParameter = {
+    //     onAfter: null,
+    //     onBefore: null,
+    // };
+    const apiGetDocs = async ({ ...takeOnParameter }) => {
         try {
+            setGetLoading(true);
+            executeOnBefore(takeOnParameter?.onBefore);
             const response = await getDocs(collectionRef);
             const filteredDocs = response.docs.map((doc) => ({
                 id: doc?.id,
                 ...doc?.data(),
             }));
-
-            executeAfterFunctionWork(afterFunctionWork, filteredDocs);
+            setGetLoading(false);
+            executeOnAfter(takeOnParameter?.onAfter, filteredDocs);
         } catch (err) {
             console.log(err);
         }
     };
-    const apiAddDoc = async (afterFunctionWork = null, values) => {
+    const apiAddDoc = async ({ ...takeOnParameter }, values) => {
         try {
-            const res = await addDoc(collectionRef, values);
-            executeAfterFunctionWork(afterFunctionWork, res?.id);
+            setAddLoading(true);
+            executeOnBefore(takeOnParameter?.onBefore);
+            const response = await addDoc(collectionRef, values);
+            setAddLoading(false);
+            executeOnAfter(takeOnParameter?.onAfter, response);
         } catch (err) {
             console.log(err);
         }
     };
-    const apiDeleteDoc = async (afterFunctionWork = null, id) => {
+    const apiDeleteDoc = async ({ ...takeOnParameter }, id) => {
         try {
+            setDeleteLoading(true);
+            executeOnBefore(takeOnParameter?.onBefore);
             await deleteDoc(doc(firebaseStore, collectionName, id));
-            executeAfterFunctionWork(afterFunctionWork);
+            setDeleteLoading(false);
+            executeOnAfter(takeOnParameter?.onAfter);
         } catch (err) {
             console.log(err);
         }
     };
-    const apiUpdateDoc = async (afterFunctionWork = null, id, newValues) => {
+    const apiUpdateDoc = async ({ ...takeOnParameter }, id, newValues) => {
         try {
-            await updateDoc(doc(firebaseStore, collectionName, id), newValues);
-            executeAfterFunctionWork(afterFunctionWork);
+            setUpdateLoading(true);
+            executeOnBefore(takeOnParameter?.onBefore);
+            const response = await updateDoc(doc(firebaseStore, collectionName, id), newValues);
+            setUpdateLoading(false);
+            executeOnAfter(takeOnParameter?.onAfter, response);
         } catch (err) {
             console.log(err);
         }
     };
 
-    return { apiGetDocs, apiAddDoc, apiDeleteDoc, apiUpdateDoc };
+    return { apiGetDocs, apiAddDoc, apiDeleteDoc, apiUpdateDoc, getLoading, addLoading, deleteLoading, updateLoading };
 };
 
 export default useFirestore;
