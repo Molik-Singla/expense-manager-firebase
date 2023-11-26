@@ -8,10 +8,9 @@ import { AuthPage, HomePage } from "./pages";
 import LoadingSpinner from "./animations/LoadingSpinner";
 
 // 👉 --------------------------------- Others -------------------------------------- //
+import Cookies from "js-cookie";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { ProtectedRoute } from "./routes";
-import { firebaseAuth } from "./config/firebase";
-import { onAuthStateChanged } from "firebase/auth";
 import { login } from "./store/authSlice";
 
 const App = () => {
@@ -24,22 +23,18 @@ const App = () => {
 
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
     // navigate the user according to it is login or not
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
-            if (user) {
-                // console.log(new Date(parseInt(user?.metadata?.lastLoginAt)));
-                // console.log(new Date(user?.stsTokenManager?.expirationTime));
 
-                console.log("User is Here...");
-                loadingFirstRef.current = false;
-                dispatch(login({ token: user?.accessToken, isLogin: true }));
-                navigate("/");
-            } else {
-                loadingFirstRef.current = false;
-                navigate("/auth");
-            }
-        });
-        return () => unsubscribe();
+    useEffect(() => {
+        const userData = JSON.parse(Cookies.get("user") || null);
+        const tokenData = JSON.parse(Cookies.get("token") || null);
+
+        if (userData?.uid && tokenData) {
+            dispatch(login({ isLogin: true, user: userData, token: tokenData }));
+            navigate("/");
+        } else {
+            navigate("/auth");
+        }
+        loadingFirstRef.current = false;
     }, []);
 
     return (
@@ -75,3 +70,26 @@ const App = () => {
 };
 
 export default App;
+// console.log(new Date(parseInt(user?.metadata?.lastLoginAt)));
+// console.log(new Date(user?.stsTokenManager?.expirationTime));
+// useEffect(() => {
+//     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+//         if (user) {
+//             // if we have user then get the user saved data from Cookies and update state ( while login first time it happens from api login function as we can set the cookies there )
+//             console.log("User is Here... ");
+//             loadingFirstRef.current = false;
+
+//             const userData = JSON.parse(Cookies.get("user") || "{}");
+//             const tokenData = JSON.parse(Cookies.get("token") || "{}");
+
+//             if (userData?.uid == user?.uid && tokenData) dispatch(login({ isLogin: true, user: userData, token: tokenData }));
+//             else dispatch(login({ isLogin: true }));
+
+//             navigate("/");
+//         } else {
+//             loadingFirstRef.current = false;
+//             navigate("/auth");
+//         }
+//     });
+//     return () => unsubscribe();
+// }, []);

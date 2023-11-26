@@ -13,6 +13,7 @@ import LoadingSpinner from "./../animations/LoadingSpinner";
 // 👉 --------------------------------- Others -------------------------------------- //
 import { login } from "../store/authSlice";
 import { notifyError } from "../animations/Toastify";
+import Cookies from "js-cookie";
 
 const AuthPage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
@@ -31,6 +32,15 @@ const AuthPage = () => {
         </div>
     );
 
+    const performAfterAuth = (data) => {
+        // we can set time but default it is in "DAYS" like 7
+        // let inTwoMinutes = new Date(new Date().getTime() + 2 * 60 * 1000);
+        // set auth data when user perform auth and set values in Cookies
+        dispatch(login({ token: data?.token, isLogin: true, user: data?.user }));
+        Cookies.set("user", JSON.stringify(data?.user), { expires: parseInt(import.meta.env.VITE_COOKIE_EXPIRE_TIME) });
+        Cookies.set("token", JSON.stringify(data?.token), { expires: parseInt(import.meta.env.VITE_COOKIE_EXPIRE_TIME) });
+        navigate("/");
+    };
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
     const handleOnChange = (evt) => {
         const { name, value } = evt.target;
@@ -44,37 +54,16 @@ const AuthPage = () => {
             return notifyError("Password and Confirm Password must be same");
         } else if (isSignUp) {
             // signup
-            apiSignupWithEmailPassword(
-                {
-                    onAfter: () => {
-                        dispatch(login());
-                        navigate("/");
-                    },
-                },
-                inputValues?.email,
-                inputValues?.password
-            );
+            apiSignupWithEmailPassword({ onAfter: performAfterAuth }, inputValues?.email, inputValues?.password);
         } else if (!isSignUp) {
             // Login
-            apiLoginWithEmailPassword(
-                {
-                    onAfter: () => {
-                        dispatch(login());
-                        navigate("/");
-                    },
-                },
-                inputValues?.email,
-                inputValues?.password
-            );
+            apiLoginWithEmailPassword({ onAfter: performAfterAuth }, inputValues?.email, inputValues?.password);
         }
     };
 
     const handleAuthenticationWithGoogle = () => {
         apiLoginWithGoogle({
-            onAfter: () => {
-                dispatch(login());
-                navigate("/");
-            },
+            onAfter: performAfterAuth,
         });
     };
     const handleChangeLoginOrSignup = () => setIsSignUp((prev) => !prev);

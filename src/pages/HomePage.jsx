@@ -12,6 +12,8 @@ import Button from "../components/Layouts/Button";
 import LoadingSpinner from "../animations/LoadingSpinner";
 
 // 👉 --------------------------------- Others -------------------------------------- //
+import { logout, selectAuth } from "../store/authSlice";
+import { where } from "firebase/firestore";
 import {
     addTransaction,
     addTransactions,
@@ -20,15 +22,16 @@ import {
     deleteTransaction,
     clearTransactions,
 } from "../store/transactionSlice";
-import { logout } from "../store/authSlice";
 import { INPUT_VALUES_INITIAL_STATE } from "../utils/constants";
+import Cookies from "js-cookie";
 
 const HomePage = () => {
     // 👉 ---------------------------- States/ Variables -------------------------------- //
     const dispatch = useDispatch();
     const transactions = useSelector(selectTransactions);
+    const currentUser = useSelector(selectAuth);
 
-    const { apiAddDoc, apiDeleteDoc, apiGetDocs, apiUpdateDoc, getLoading, addLoading } = useFirestore(null, "expenses");
+    const { apiAddDoc, apiDeleteDoc, apiUpdateDoc, apiGetDocsByQuery, getLoading, addLoading } = useFirestore(null, "expenses");
     const { apiLogout } = useAuth();
 
     const totalAmount = transactions
@@ -37,13 +40,24 @@ const HomePage = () => {
         }, 0)
         ?.toLocaleString();
 
+    const sortByDate = (arrList, dateKey) => {
+        return arrList.sort((obj1, obj2) => {
+            const dateA = new Date(obj1[dateKey]);
+            const dateB = new Date(obj2[dateKey]);
+            return dateA - dateB;
+        });
+    };
     // 👉 -------------------------- Functions/ useEffect ------------------------------- //
     const apiGetTransactions = () => {
-        apiGetDocs({
-            onAfter: (data) => {
-                dispatch(addTransactions(data));
+        apiGetDocsByQuery(
+            {
+                onAfter: (data) => {
+                    const sorterData = sortByDate(data, "date");
+                    dispatch(addTransactions(sorterData));
+                },
             },
-        });
+            where("userID", "==", currentUser?.user?.uid)
+        );
     };
     const handleAddNewTransaction = (newValues) => {
         const newData = {
@@ -52,6 +66,7 @@ const HomePage = () => {
             amount: newValues?.amount,
             date: newValues?.date,
             transactionType: newValues?.transactionType,
+            userID: currentUser?.user?.uid,
         };
 
         apiAddDoc(
@@ -90,13 +105,15 @@ const HomePage = () => {
             onAfter: () => {
                 dispatch(logout());
                 dispatch(clearTransactions());
+                Cookies.remove("user");
+                Cookies.remove("token");
             },
         });
     };
 
     useEffect(() => {
-        apiGetTransactions();
-    }, []);
+        if (currentUser?.user?.uid) apiGetTransactions();
+    }, [currentUser]);
 
     return (
         <section className="flex items-center justify-center w-full h-full min-h-screen bg-black font-primary">

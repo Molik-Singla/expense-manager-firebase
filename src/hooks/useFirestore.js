@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc, getDoc, query } from "firebase/firestore";
 import { firebaseStore } from "../config/firebase";
 import { useState } from "react";
 import { notifyError } from "../animations/Toastify";
@@ -37,6 +37,26 @@ const useFirestore = (initialState = null, collectionName) => {
             setGetLoading(true);
             executeOnBefore(takeOnParameter?.onBefore);
             const response = await getDocs(collectionRef);
+            const filteredDocs = response.docs.map((doc) => ({
+                id: doc?.id,
+                ...doc?.data(),
+            }));
+            setGetLoading(false);
+            executeOnAfter(takeOnParameter?.onAfter, filteredDocs);
+        } catch (err) {
+            handleErrors(err);
+        } finally {
+            setGetLoading(false);
+        }
+    };
+
+    const apiGetDocsByQuery = async ({ ...takeOnParameter }, queryParam) => {
+        try {
+            const myQuery = query(collectionRef, queryParam);
+
+            setGetLoading(true);
+            executeOnBefore(takeOnParameter?.onBefore);
+            const response = await getDocs(myQuery);
             const filteredDocs = response.docs.map((doc) => ({
                 id: doc?.id,
                 ...doc?.data(),
@@ -89,7 +109,28 @@ const useFirestore = (initialState = null, collectionName) => {
         }
     };
 
-    return { apiGetDocs, apiAddDoc, apiDeleteDoc, apiUpdateDoc, getLoading, addLoading, deleteLoading, updateLoading };
+    const getSingleDoc = async ({ ...takeOnParameter }, id) => {
+        try {
+            executeOnBefore(takeOnParameter?.onBefore);
+            const response = await getDoc(doc(firebaseStore, collectionName, id));
+            executeOnAfter(takeOnParameter?.onAfter, response?.data());
+        } catch (err) {
+            handleErrors(err);
+        }
+    };
+
+    return {
+        apiGetDocs,
+        apiAddDoc,
+        apiDeleteDoc,
+        apiUpdateDoc,
+        getSingleDoc,
+        apiGetDocsByQuery,
+        getLoading,
+        addLoading,
+        deleteLoading,
+        updateLoading,
+    };
 };
 
 export default useFirestore;

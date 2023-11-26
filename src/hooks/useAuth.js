@@ -27,6 +27,15 @@ const useAuth = () => {
     const executeOnAfter = (onAfter, data = null) => onAfter && onAfter(data);
     const executeOnBefore = (onBefore) => onBefore && onBefore();
 
+    const extractUser = (user) => {
+        return {
+            uid: user?.uid,
+            email: user?.email,
+            displayName: user?.displayName,
+            photoURL: user?.photoURL,
+        };
+    };
+
     const apiSignupWithEmailPassword = async ({ ...takeReqParameter }, email, password) => {
         try {
             setSignupLoading(true);
@@ -35,7 +44,7 @@ const useAuth = () => {
             const { user } = response;
             const token = await user?.getIdToken();
             const data = {
-                user,
+                user: extractUser(user),
                 token,
             };
             setSignupLoading(false);
@@ -53,19 +62,19 @@ const useAuth = () => {
             const response = await signInWithEmailAndPassword(firebaseAuth, email, password);
             const { user } = response;
             const token = await user?.getIdToken();
-            const data = {
-                user,
-                token,
-            };
+
             setLoginLoading(false);
-            executeOnAfter(takeReqParameter?.onAfter, data);
+
+            executeOnAfter(takeReqParameter?.onAfter, {
+                user: extractUser(user),
+                token,
+            });
         } catch (error) {
             handleErrors(error);
         } finally {
             setLoginLoading(false);
         }
     };
-
     const apiLoginWithGoogle = async ({ ...takeReqParameter }) => {
         try {
             executeOnBefore(takeReqParameter?.onBefore);
@@ -73,7 +82,7 @@ const useAuth = () => {
             const { user } = response;
             const token = await user?.getIdToken();
             const data = {
-                user,
+                user: extractUser(user),
                 token,
             };
             executeOnAfter(takeReqParameter?.onAfter, data);
