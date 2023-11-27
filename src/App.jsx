@@ -37,6 +37,17 @@ const App = () => {
         loadingFirstRef.current = false;
     }, []);
 
+    // onAuthStateChanged(firebaseAuth, (user) => {
+    //     if (user) {
+    //         // console.log(new Date(parseInt(user?.metadata?.lastLoginAt)));
+    //         // console.log(new Date(user?.stsTokenManager?.expirationTime));
+
+    //         console.log(user?.accessToken);
+    //         const tokenData = JSON.parse(Cookies.get("token") || null);
+    //         console.log(tokenData);
+    //     }
+    // });
+
     return (
         <>
             {loadingFirstRef.current ? (
@@ -93,3 +104,15 @@ export default App;
 //     });
 //     return () => unsubscribe();
 // }, []);
+
+// Concepts =>
+
+// 1. Protected Route ( Wrapper Component )
+// 2. Cookies ( to store user data and token )
+// 3. Redux Toolkit ( to manage state )
+// 4. Firebase Auth ( to manage auth )
+// 5. Firebase Firestore ( to manage database )
+// 6. Advance Callbacks ( to manage async functions )
+// 7. Custom Hooks ( to manage common logic )
+// 8. React Router
+// 9. Code Refactoring ( to manage code )
