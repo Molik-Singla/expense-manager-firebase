@@ -8,7 +8,7 @@ const Button = ({ children, additionalClasses = "", className = "", onClick, typ
             className={`${
                 className
                     ? className
-                    : "w-full h-9 px-8 mt-4 font-semibold text-black transition-all duration-200 bg-gray-200 rounded-lg hover:bg-gray-50 " +
+                    : "w-full h-9 px-8 mt-2 font-semibold text-black transition-all duration-200 bg-gray-200 rounded-lg hover:bg-gray-50 " +
                       additionalClasses
             }`}
             onClick={onClick}

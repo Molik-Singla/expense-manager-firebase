@@ -119,13 +119,13 @@ const HomePage = () => {
     }, [currentUser]);
 
     return (
-        <section className="flex items-center justify-center w-full h-full min-h-screen bg-black font-primary">
-            <section className="fixed top-0 flex justify-end w-full p-4">
+        <section className="flex flex-col items-center justify-center w-full h-screen min-h-screen bg-black font-primary">
+            <section className="static top-0 flex items-end justify-end w-full p-1 pr-4 h-14">
                 <div>
                     <Button onClick={handleLogout}>Logout</Button>
                 </div>
             </section>
-            <section className="flex flex-col w-full h-screen max-w-xl gap-3 px-4 pt-24 pb-8 text-white bg-transparent">
+            <section className="flex flex-col w-full h-[calc(100vh-3.5rem)] max-w-xl gap-3 px-4 pt-16 pb-8 text-white bg-transparent">
                 <div className="flex justify-center text-4xl font-semibold md:text-5xl">
                     <p>
                         <span className="mr-2">₹</span>
