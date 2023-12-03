@@ -37,17 +37,6 @@ const App = () => {
         loadingFirstRef.current = false;
     }, []);
 
-    // onAuthStateChanged(firebaseAuth, (user) => {
-    //     if (user) {
-    //         // console.log(new Date(parseInt(user?.metadata?.lastLoginAt)));
-    //         // console.log(new Date(user?.stsTokenManager?.expirationTime));
-
-    //         console.log(user?.accessToken);
-    //         const tokenData = JSON.parse(Cookies.get("token") || null);
-    //         console.log(tokenData);
-    //     }
-    // });
-
     return (
         <>
             {loadingFirstRef.current ? (
@@ -81,30 +70,6 @@ const App = () => {
 };
 
 export default App;
-// console.log(new Date(parseInt(user?.metadata?.lastLoginAt)));
-// console.log(new Date(user?.stsTokenManager?.expirationTime));
-// useEffect(() => {
-//     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
-//         if (user) {
-//             // if we have user then get the user saved data from Cookies and update state ( while login first time it happens from api login function as we can set the cookies there )
-//             console.log("User is Here... ");
-//             loadingFirstRef.current = false;
-
-//             const userData = JSON.parse(Cookies.get("user") || "{}");
-//             const tokenData = JSON.parse(Cookies.get("token") || "{}");
-
-//             if (userData?.uid == user?.uid && tokenData) dispatch(login({ isLogin: true, user: userData, token: tokenData }));
-//             else dispatch(login({ isLogin: true }));
-
-//             navigate("/");
-//         } else {
-//             loadingFirstRef.current = false;
-//             navigate("/auth");
-//         }
-//     });
-//     return () => unsubscribe();
-// }, []);
-
 // Concepts =>
 
 // 1. Protected Route ( Wrapper Component )
